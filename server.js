@@ -6,6 +6,7 @@ const productRoutes = require("./routes/products");
 const cartRoutes = require("./routes/cartRoutes");
 const orderRoutes = require("./routes/orders");
 const analyticsRoutes = require("./routes/analytics");
+const categoryRoutes = require("./routes/categories");
 const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
@@ -30,6 +31,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/analytics", analyticsRoutes);
+app.use("/api/categories", categoryRoutes);
 
 // Basic root
 app.get("/", (req, res) => {
