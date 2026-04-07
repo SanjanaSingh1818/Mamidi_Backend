@@ -52,7 +52,16 @@ exports.getOrder = async (req, res, next) => {
 exports.updateStatus = async (req, res, next) => {
   try {
     const { status } = req.body;
-    const allowed = ["pending", "shipped", "delivered", "issue", "cancelled"];
+    const allowed = [
+      "pending",
+      "shipped",
+      "delivered",
+      "issue",
+      "cancelled",
+      "complete",
+      "paid",
+      "unpaid",
+    ];
     if (!allowed.includes(status)) {
       return res.status(400).json({ message: "Invalid status" });
     }
