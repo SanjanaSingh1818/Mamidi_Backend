@@ -43,23 +43,15 @@ app.get("/", (req, res) => {
 
 // Error handler
 app.use((err, req, res, next) => {
-  const statusCode = err.status || err.statusCode || 500;
+  console.error("🔥 FULL ERROR 👉", err);  // 👈 real error
 
-  console.error("API Error:", {
-    message: err.message,
-    code: err.code,
-    details: err.errors || err.message,
-    path: req.path,
-    method: req.method,
-  });
-
-  res.status(statusCode).json({
-    message: err.message || "Server error",
-    error: err.message,
-    path: req.path
+  res.status(500).json({
+    message: err?.message || "Server error",
   });
 });
 
 app.listen(PORT, () => {
   console.log(`Server started on http://localhost:${PORT}`);
 });
+
+
