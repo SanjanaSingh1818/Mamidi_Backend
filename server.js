@@ -33,6 +33,7 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/uploads", express.static("uploads"));
 
 // Basic root
 app.get("/", (req, res) => {
