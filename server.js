@@ -13,6 +13,7 @@ const MONGO_URI = process.env.MONGO_URI;
 
 app.use(cors());
 app.use(express.json()); // parse JSON bodies
+app.use('/uploads', express.static('uploads')); // serve uploaded files
 
 // Connect to MongoDB
 mongoose

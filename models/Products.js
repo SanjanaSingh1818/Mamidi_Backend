@@ -1,11 +1,26 @@
 const mongoose = require("mongoose");
 
 const productSchema = new mongoose.Schema({
-  main: String,
-  sideimg1: String,
-  sideimg2: String,
-  sideimg3: String,
-  sideimg4: String,
+  main: {
+    type: [{ type: { type: String, enum: ['url', 'file'] }, value: String }],
+    default: []
+  },
+  sideimg1: {
+    type: [{ type: { type: String, enum: ['url', 'file'] }, value: String }],
+    default: []
+  },
+  sideimg2: {
+    type: [{ type: { type: String, enum: ['url', 'file'] }, value: String }],
+    default: []
+  },
+  sideimg3: {
+    type: [{ type: { type: String, enum: ['url', 'file'] }, value: String }],
+    default: []
+  },
+  sideimg4: {
+    type: [{ type: { type: String, enum: ['url', 'file'] }, value: String }],
+    default: []
+  },
   title: String,
   price: String,
   description: String,

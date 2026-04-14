@@ -1,6 +1,28 @@
 const express = require("express");
 const router = express.Router();
 const Product = require("../models/Products");
+const multer = require("multer");
+const path = require("path");
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
+const upload = multer({ storage });
+
+// Middleware for multiple fields
+const uploadFields = upload.fields([
+  { name: 'main', maxCount: 10 },
+  { name: 'sideimg1', maxCount: 10 },
+  { name: 'sideimg2', maxCount: 10 },
+  { name: 'sideimg3', maxCount: 10 },
+  { name: 'sideimg4', maxCount: 10 }
+]);
 
 // GET /api/products - list all products (with optional ?search= and pagination)
 router.get("/", async (req, res, next) => {
@@ -38,9 +60,33 @@ router.get("/:id", async (req, res, next) => {
 });
 
 // POST /api/products - create product
-router.post("/", async (req, res, next) => {
+router.post("/", uploadFields, async (req, res, next) => {
   try {
-    const payload = req.body;
+    const payload = { ...req.body };
+
+    // Process images
+    const imageFields = ['main', 'sideimg1', 'sideimg2', 'sideimg3', 'sideimg4'];
+    imageFields.forEach(field => {
+      const images = [];
+      // Add URLs if provided
+      if (payload[field]) {
+        if (Array.isArray(payload[field])) {
+          payload[field].forEach(url => {
+            if (url) images.push({ type: 'url', value: url });
+          });
+        } else if (typeof payload[field] === 'string' && payload[field]) {
+          images.push({ type: 'url', value: payload[field] });
+        }
+      }
+      // Add uploaded files
+      if (req.files && req.files[field]) {
+        req.files[field].forEach(file => {
+          images.push({ type: 'file', value: file.path });
+        });
+      }
+      payload[field] = images;
+    });
+
     const product = new Product(payload);
     await product.save();
     res.status(201).json(product);
@@ -50,9 +96,34 @@ router.post("/", async (req, res, next) => {
 });
 
 // PUT /api/products/:id - update product
-router.put("/:id", async (req, res, next) => {
+router.put("/:id", uploadFields, async (req, res, next) => {
   try {
-    const updated = await Product.findByIdAndUpdate(req.params.id, req.body, {
+    const payload = { ...req.body };
+
+    // Process images
+    const imageFields = ['main', 'sideimg1', 'sideimg2', 'sideimg3', 'sideimg4'];
+    imageFields.forEach(field => {
+      const images = [];
+      // Add URLs if provided
+      if (payload[field]) {
+        if (Array.isArray(payload[field])) {
+          payload[field].forEach(url => {
+            if (url) images.push({ type: 'url', value: url });
+          });
+        } else if (typeof payload[field] === 'string' && payload[field]) {
+          images.push({ type: 'url', value: payload[field] });
+        }
+      }
+      // Add uploaded files
+      if (req.files && req.files[field]) {
+        req.files[field].forEach(file => {
+          images.push({ type: 'file', value: file.path });
+        });
+      }
+      payload[field] = images;
+    });
+
+    const updated = await Product.findByIdAndUpdate(req.params.id, payload, {
       new: true,
       runValidators: true
     });
