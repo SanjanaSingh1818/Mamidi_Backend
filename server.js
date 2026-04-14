@@ -43,6 +43,8 @@ app.get("/", (req, res) => {
 
 // Error handler
 app.use((err, req, res, next) => {
+  const statusCode = err.status || err.statusCode || 500;
+
   console.error("API Error:", {
     message: err.message,
     code: err.code,
@@ -50,8 +52,9 @@ app.use((err, req, res, next) => {
     path: req.path,
     method: req.method,
   });
-  res.status(500).json({
-    message: "Server error",
+
+  res.status(statusCode).json({
+    message: err.message || "Server error",
     error: err.message,
     path: req.path
   });
