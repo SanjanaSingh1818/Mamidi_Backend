@@ -5,14 +5,18 @@ const multer = require("multer");
 const path = require("path");
 
 // Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
+const multer = require("multer");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("../config/cloudinary");
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "products",
+    allowed_formats: ["jpg", "png", "jpeg", "webp"],
   },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  }
 });
+
 const upload = multer({ storage });
 
 // Middleware for multiple fields
@@ -81,7 +85,7 @@ router.post("/", uploadFields, async (req, res, next) => {
       // Add uploaded files
       if (req.files && req.files[field]) {
         req.files[field].forEach(file => {
-          images.push({ type: 'file', value: file.path });
+          images.push({ type: 'file', value: file.path }); 
         });
       }
       payload[field] = images;
@@ -98,6 +102,10 @@ router.post("/", uploadFields, async (req, res, next) => {
 // PUT /api/products/:id - update product
 router.put("/:id", uploadFields, async (req, res, next) => {
   try {
+    console.log(`[PUT /api/products/${req.params.id}] Updating...`);
+    console.log("req.body:", req.body);
+    console.log("req.files:", req.files ? Object.keys(req.files) : "none");
+
     const payload = { ...req.body };
 
     // Process images
@@ -123,13 +131,21 @@ router.put("/:id", uploadFields, async (req, res, next) => {
       payload[field] = images;
     });
 
+    console.log("Final payload:", JSON.stringify(payload, null, 2));
+
     const updated = await Product.findByIdAndUpdate(req.params.id, payload, {
       new: true,
       runValidators: true
     });
     if (!updated) return res.status(404).json({ message: "Product not found" });
+    console.log(`[PUT /api/products/${req.params.id}] Success`);
     res.json(updated);
   } catch (err) {
+    console.error(`[PUT /api/products/${req.params.id}] Error:`, {
+      message: err.message,
+      code: err.code,
+      details: err.errors || err.message
+    });
     next(err);
   }
 });

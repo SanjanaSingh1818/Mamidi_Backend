@@ -13,6 +13,7 @@ const MONGO_URI = process.env.MONGO_URI;
 
 app.use(cors());
 app.use(express.json()); // parse JSON bodies
+app.use(express.urlencoded({ extended: true })); // parse FormData text fields
 app.use('/uploads', express.static('uploads')); // serve uploaded files
 
 // Connect to MongoDB
@@ -40,10 +41,20 @@ app.get("/", (req, res) => {
   res.send({ message: "Mamidi ecom backend is running" });
 });
 
-// Error handler (simple)
+// Error handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: "Server error", error: err.message });
+  console.error("API Error:", {
+    message: err.message,
+    code: err.code,
+    details: err.errors || err.message,
+    path: req.path,
+    method: req.method,
+  });
+  res.status(500).json({
+    message: "Server error",
+    error: err.message,
+    path: req.path
+  });
 });
 
 app.listen(PORT, () => {
