@@ -67,40 +67,52 @@ router.get("/:id", async (req, res, next) => {
 });
 
 // POST /api/products - create product
-router.post("/", uploadFields, async (req, res, next) => {
+
+router.post("/", uploadFields, async (req, res) => {
   try {
+    console.log("📥 BODY:", req.body);
+    console.log("📸 FILES:", req.files);
+
     const payload = { ...req.body };
 
-    // Process images
-    const imageFields = ['main', 'sideimg1', 'sideimg2', 'sideimg3', 'sideimg4'];
-    imageFields.forEach(field => {
+    const imageFields = ["main", "sideimg1", "sideimg2", "sideimg3", "sideimg4"];
+
+    imageFields.forEach((field) => {
       const images = [];
-      // Add URLs if provided
-      if (payload[field]) {
-        if (Array.isArray(payload[field])) {
-          payload[field].forEach(url => {
-            if (url) images.push({ type: 'url', value: url });
-          });
-        } else if (typeof payload[field] === 'string' && payload[field]) {
-          images.push({ type: 'url', value: payload[field] });
-        }
-      }
-      // Add uploaded files
+
+      // ✅ Only handle uploaded files (Cloudinary)
       if (req.files && req.files[field]) {
-        req.files[field].forEach(file => {
-          images.push({ type: 'file', value: file.path }); 
+        req.files[field].forEach((file) => {
+          images.push({
+            type: "file",
+            value: file.path, // Cloudinary URL
+          });
         });
       }
+
       payload[field] = images;
     });
 
     const product = new Product(payload);
     await product.save();
-    res.status(201).json(product);
+
+    res.status(201).json({
+      success: true,
+      message: "Product created successfully",
+      data: product,
+    });
+
   } catch (err) {
-    next(err);
+    console.error("❌ POST /api/products ERROR:", err);
+
+    res.status(500).json({
+      success: false,
+      message: err.message || "Something went wrong",
+    });
   }
 });
+
+
 
 // PUT /api/products/:id - update product
 router.put("/:id", uploadFields, async (req, res, next) => {
@@ -112,27 +124,23 @@ router.put("/:id", uploadFields, async (req, res, next) => {
     const payload = { ...req.body };
 
     // Process images
-    const imageFields = ['main', 'sideimg1', 'sideimg2', 'sideimg3', 'sideimg4'];
-    imageFields.forEach(field => {
-      const images = [];
-      // Add URLs if provided
-      if (payload[field]) {
-        if (Array.isArray(payload[field])) {
-          payload[field].forEach(url => {
-            if (url) images.push({ type: 'url', value: url });
-          });
-        } else if (typeof payload[field] === 'string' && payload[field]) {
-          images.push({ type: 'url', value: payload[field] });
-        }
-      }
-      // Add uploaded files
-      if (req.files && req.files[field]) {
-        req.files[field].forEach(file => {
-          images.push({ type: 'file', value: file.path });
-        });
-      }
-      payload[field] = images;
+const imageFields = ["main", "sideimg1", "sideimg2", "sideimg3", "sideimg4"];
+
+imageFields.forEach((field) => {
+  const images = [];
+
+  if (req.files && req.files[field]) {
+    req.files[field].forEach((file) => {
+      images.push({
+        type: "file",
+        value: file.path,
+      });
     });
+  }
+
+  payload[field] = images;
+});
+
 
     console.log("Final payload:", JSON.stringify(payload, null, 2));
 
