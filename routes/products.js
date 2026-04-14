@@ -1,23 +1,26 @@
+
 const express = require("express");
 const router = express.Router();
 const Product = require("../models/Products");
-const multer = require("multer");
-const path = require("path");
 
-// Configure multer for file uploads
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../config/cloudinary");
 
+// ✅ Cloudinary storage config
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: {
-    folder: "products",
-    allowed_formats: ["jpg", "png", "jpeg", "webp"],
+  params: async (req, file) => {
+    return {
+      folder: "products",
+      resource_type: "image", // ✅ important
+      allowed_formats: ["jpg", "png", "jpeg", "webp"],
+    };
   },
 });
 
 const upload = multer({ storage });
+
 
 // Middleware for multiple fields
 const uploadFields = upload.fields([
