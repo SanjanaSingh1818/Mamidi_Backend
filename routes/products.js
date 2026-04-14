@@ -24,17 +24,33 @@ const uploadFields = upload.fields(
 );
 
 function toArray(value) {
-  if (value === undefined || value === null || value === "") return [];
-  return Array.isArray(value) ? value : [value];
+  if (!value) return [];
+
+  // if already array
+  if (Array.isArray(value)) return value;
+
+  // try parsing JSON string
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed : [parsed];
+  } catch {
+    return [value];
+  }
 }
 
 function buildImageEntries(field, req) {
   const existingImages = toArray(req.body[field])
-    .map((value) => ({ type: "file", value }))
+    .map((value) => ({
+      type: "file",
+      value: typeof value === "object" ? value.value : value,
+    }))
     .filter((image) => image.value);
 
   const uploadedImages = (req.files?.[field] || [])
-    .map((file) => ({ type: "file", value: file.path }))
+    .map((file) => ({
+      type: "file",
+      value: file.path, // Cloudinary URL
+    }))
     .filter((image) => image.value);
 
   return [...existingImages, ...uploadedImages];
@@ -99,6 +115,7 @@ router.get("/:id", async (req, res, next) => {
 
 router.post("/", uploadFields, async (req, res, next) => {
   try {
+
     const payload = buildProductPayload(req);
     const product = await Product.create(payload);
 
@@ -110,10 +127,14 @@ router.post("/", uploadFields, async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+
 });
 
 router.put("/:id", uploadFields, async (req, res, next) => {
   try {
+ console.log("BODY 👉", req.body);
+    console.log("FILES 👉", req.files);
+
     const payload = buildProductPayload(req, { preserveMissingImages: true });
     const updated = await Product.findByIdAndUpdate(req.params.id, payload, {
       new: true,
