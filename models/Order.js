@@ -3,31 +3,31 @@ const mongoose = require("mongoose");
 const orderItemSchema = new mongoose.Schema(
   {
     productId: { type: mongoose.Schema.Types.ObjectId, ref: "Products", required: true },
-    title: { type: String, required: true },
+    title: { category: String, required: true },
     price: { type: Number, required: true },
     quantity: { type: Number, required: true, default: 1 },
-    image: { type: String },
+    image: { category: String },
   },
   { _id: false }
 );
 
 const orderSchema = new mongoose.Schema(
   {
-    orderId: { type: String, required: true, unique: true },
+    orderId: { category: String, required: true, unique: true },
     customer: {
-      name: { type: String, required: true },
-      email: { type: String },
-      avatar: { type: String },
-      phone: { type: String },
-      address: { type: String },
-      city: { type: String },
-      state: { type: String },
-      postalCode: { type: String },
-      country: { type: String },
+      name: { category: String, required: true },
+      email: { category: String },
+      avatar: { category: String },
+      phone: { category: String },
+      address: { category: String },
+      city: { category: String },
+      state: { category: String },
+      postalCode: { category: String },
+      country: { category: String },
     },
     items: { type: [orderItemSchema], required: true },
     status: {
-      type: String,
+      category: String,
       enum: [
         "pending",
         "shipped",
@@ -43,11 +43,11 @@ const orderSchema = new mongoose.Schema(
     total: { type: Number, required: true },
     placedAt: { type: Date, default: Date.now },
     shipping: {
-      method: { type: String },
-      trackingNumber: { type: String },
+      method: { category: String },
+      trackingNumber: { category: String },
       expectedDate: { type: Date },
     },
-    notes: { type: String },
+    notes: { category: String },
   },
   { collection: "Orders", timestamps: true }
 );

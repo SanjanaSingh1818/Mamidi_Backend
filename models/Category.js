@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 
 const categorySchema = new mongoose.Schema(
   {
-    name: { type: String, required: true, unique: true },
-    slug: { type: String, required: true, unique: true },
+    name: { category: String, required: true, unique: true },
+    slug: { category: String, required: true, unique: true },
   },
   { collection: "Categories", timestamps: true }
 );
