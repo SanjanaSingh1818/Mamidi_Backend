@@ -59,11 +59,9 @@ function buildImageEntries(field, req) {
 function buildProductPayload(req, { preserveMissingImages = false } = {}) {
   const payload = { ...req.body };
 
-  if (!payload.Type && payload.category) {
-    payload.Type = payload.category;
-  }
-
-  delete payload.category;
+  // No need to map Type to category anymore - frontend now sends "category" directly
+  // Remove any legacy Type field if present
+  delete payload.Type;
 
   imageFields.forEach((field) => {
     const images = buildImageEntries(field, req);

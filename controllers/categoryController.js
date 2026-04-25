@@ -59,9 +59,9 @@ exports.update = async (req, res, next) => {
     if (existing) {
       return res.status(409).json({ message: "Category name or slug already exists" });
     }
-    // Update products' Type if name changed
+    // Update products' category if name changed
     if (category.name !== name) {
-      await Products.updateMany({ Type: category.name }, { Type: name });
+      await Products.updateMany({ category: category.name }, { category: name });
     }
     category.name = name;
     category.slug = newSlug;
@@ -81,7 +81,7 @@ exports.remove = async (req, res, next) => {
       return res.status(404).json({ message: "Category not found" });
     }
     // Check if any products are linked
-    const linkedProducts = await Products.countDocuments({ Type: category.name });
+    const linkedProducts = await Products.countDocuments({ category: category.name });
     if (linkedProducts > 0) {
       return res.status(409).json({
         message: `Cannot delete category. ${linkedProducts} product(s) are linked to this category. Please reassign or remove the products first.`

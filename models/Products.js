@@ -25,7 +25,7 @@ const productSchema = new mongoose.Schema({
   price: String,
   description: String,
   Occasion: String,
-  Type: String,
+  category: String,
   Material: String,
   Colour: String,
   Dimensions: String,
