@@ -37,3 +37,54 @@ exports.create = async (req, res, next) => {
     next(err);
   }
 };
+
+// PUT /api/categories/:id
+exports.update = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { name } = req.body;
+
+    if (!name) {
+      return res.status(400).json({ message: "name is required" });
+    }
+
+    const category = await Category.findById(id);
+    if (!category) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+
+    const slug = slugify(name);
+    const existing = await Category.findOne({
+      $or: [{ name }, { slug }],
+      _id: { $ne: id }
+    });
+
+    if (existing) {
+      return res.status(409).json({ message: "Category already exists" });
+    }
+
+    category.name = name;
+    category.slug = slug;
+    await category.save();
+    res.json(category);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// DELETE /api/categories/:id
+exports.delete = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const category = await Category.findById(id);
+    if (!category) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+
+    await Category.deleteOne({ _id: id });
+    res.json({ message: "Category deleted successfully", id });
+  } catch (err) {
+    next(err);
+  }
+};
