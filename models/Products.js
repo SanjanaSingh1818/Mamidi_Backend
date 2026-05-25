@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const SIDE_IMAGE_LIMIT = 11;
+const SIDE_IMAGE_LIMIT = 12;
 
 const imageSchema = {
   type: {
@@ -22,7 +22,7 @@ const productSchema = new mongoose.Schema(
       },
     },
 
-    // SIDE IMAGES (UP TO 11)
+    // SIDE IMAGES (UP TO 12)
     sideImages: {
       type: [imageSchema],
       default: [],
