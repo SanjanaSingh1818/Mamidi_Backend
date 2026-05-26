@@ -48,6 +48,8 @@ const productSchema = new mongoose.Schema(
   }
 );
 
+productSchema.statics.SIDE_IMAGE_LIMIT = SIDE_IMAGE_LIMIT;
+
 module.exports = mongoose.model(
   "Products",
   productSchema
