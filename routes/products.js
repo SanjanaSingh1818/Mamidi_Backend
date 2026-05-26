@@ -7,7 +7,7 @@ const Product = require("../models/Products");
 
 const router = express.Router();
 
-const SIDE_IMAGE_LIMIT = 11;
+const SIDE_IMAGE_LIMIT = 12;
 
 const storage = new CloudinaryStorage({
   cloudinary,
